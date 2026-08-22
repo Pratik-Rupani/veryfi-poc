@@ -10,6 +10,7 @@ node_modules
 node-v22.23.2-win-x64
 dist
 dist-ssr
+.next
 .output
 .vinxi
 .tanstack/**
@@ -19,6 +20,17 @@ dist-ssr
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
+# SonarCloud
+.scannerwork/
+
+# Test coverage
+coverage/
 
 # Editor directories and files
 .vscode/*

@@ -1,0 +1,93 @@
+# ─── Post-Deployment E2E Tests ─────────────────────────────────────────────────
+# Runs Playwright E2E tests against a live Vercel deployment.
+#
+# Triggers:
+#   • Automatically after a successful Vercel preview / production deploy
+#     (Vercel fires a deployment_status event to GitHub).
+#   • Manually via the Actions tab – paste the deployed URL as input.
+#
+# No build step is needed because we test the already-deployed URL.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Post-Deployment E2E
+
+on:
+  deployment_status:
+
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Deployed Vercel URL to test (e.g. https://my-app.vercel.app)"
+        required: true
+        type: string
+
+jobs:
+  e2e-deployed:
+    name: E2E on Deployed App
+    runs-on: ubuntu-latest
+
+    # Run when:
+    #   – Vercel reports a successful deployment, OR
+    #   – The workflow is triggered manually.
+    if: >-
+      (github.event_name == 'deployment_status'  &&
+       github.event.deployment_status.state      == 'success') ||
+      github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # ── Resolve the target URL ──────────────────────────────────────────────
+      - name: Resolve deployment URL
+        id: deploy-url
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "url=${{ inputs.url }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=${{ github.event.deployment_status.target_url }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Playwright setup ────────────────────────────────────────────────────
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # ── Run tests against the live URL ──────────────────────────────────────
+      - name: Run E2E against deployed app
+        run: npm run test:deployed:e2e -- --project=chromium
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.deploy-url.outputs.url }}
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployed-playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployed-playwright-failures
+          path: test-results/
+          retention-days: 14

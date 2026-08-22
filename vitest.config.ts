@@ -9,5 +9,19 @@ export default defineConfig({
   },
   test: {
     include: ["tests/**/*.test.ts"],
+    exclude: ["node_modules", "e2e"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      reportsDirectory: "coverage",
+      exclude: [
+        "node_modules/**",
+        ".next/**",
+        "src/components/ui/**",
+        "src/hooks/**",
+        "src/integrations/supabase/types.ts",
+        "**/*.d.ts",
+      ],
+    },
   },
 });
