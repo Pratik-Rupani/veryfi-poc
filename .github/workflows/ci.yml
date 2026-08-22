@@ -1,0 +1,156 @@
+# ─── Continuous Integration ────────────────────────────────────────────────────
+# Runs on every PR targeting main/develop and on every push to main.
+# Jobs: lint → build → unit tests (with coverage) → E2E → SonarCloud
+#
+# Required GitHub Secrets:
+#   SUPABASE_URL            – Supabase project URL
+#   SUPABASE_ANON_KEY       – Supabase anon/public key
+#   SUPABASE_SERVICE_ROLE_KEY – Supabase service-role key
+#   VERYFI_CLIENT_ID        – Veryfi API client ID
+#   VERYFI_CLIENT_SECRET    – Veryfi API client secret
+#   VERYFI_API_KEY          – Veryfi API key
+#   VERYFI_USERNAME         – Veryfi username
+#   SONAR_TOKEN             – SonarCloud project token  (optional until configured)
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Share env vars across all jobs – values come from repository secrets.
+env:
+  SUPABASE_URL:             ${{ secrets.SUPABASE_URL             }}
+  SUPABASE_ANON_KEY:        ${{ secrets.SUPABASE_ANON_KEY        }}
+  SUPABASE_SERVICE_ROLE_KEY:${{ secrets.SUPABASE_SERVICE_ROLE_KEY}}
+  VERYFI_CLIENT_ID:         ${{ secrets.VERYFI_CLIENT_ID         }}
+  VERYFI_CLIENT_SECRET:     ${{ secrets.VERYFI_CLIENT_SECRET     }}
+  VERYFI_API_KEY:           ${{ secrets.VERYFI_API_KEY           }}
+  VERYFI_USERNAME:          ${{ secrets.VERYFI_USERNAME          }}
+
+jobs:
+  # ── Quality checks (lint + build) ──────────────────────────────────────────
+  quality:
+    name: Lint & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Next.js build
+        run: npm run build
+
+  # ── Unit tests with coverage ───────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Vitest with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+  # ── Playwright E2E tests ────────────────────────────────────────────────────
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Cache the Playwright browser binaries (~200 MB) to speed up CI.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Playwright E2E
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failures
+          path: test-results/
+          retention-days: 7
+
+  # ── SonarCloud analysis ─────────────────────────────────────────────────────
+  # Skipped when SONAR_TOKEN is not configured (e.g. before project onboarding).
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: ${{ secrets.SONAR_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # Full history for accurate analysis
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN  }}
