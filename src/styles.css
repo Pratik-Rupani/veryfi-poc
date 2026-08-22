@@ -1,0 +1,183 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Receiptly design system — deep ink navy paper + amber scan-line accent.
+ * All colors are oklch semantic tokens. Never hardcode colors in components.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-paper: var(--paper);
+  --color-paper-foreground: var(--paper-foreground);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.9rem;
+
+  --background: oklch(0.19 0.028 253);
+  --foreground: oklch(0.96 0.008 250);
+  --card: oklch(0.235 0.03 253);
+  --card-foreground: oklch(0.96 0.008 250);
+  --popover: oklch(0.235 0.03 253);
+  --popover-foreground: oklch(0.96 0.008 250);
+
+  --primary: oklch(0.79 0.16 76);
+  --primary-foreground: oklch(0.2 0.04 60);
+
+  --secondary: oklch(0.29 0.032 253);
+  --secondary-foreground: oklch(0.94 0.01 250);
+
+  --muted: oklch(0.28 0.028 253);
+  --muted-foreground: oklch(0.72 0.02 250);
+
+  --accent: oklch(0.72 0.11 195);
+  --accent-foreground: oklch(0.19 0.028 253);
+
+  --destructive: oklch(0.62 0.2 22);
+  --destructive-foreground: oklch(0.97 0.01 250);
+
+  --success: oklch(0.72 0.15 155);
+  --success-foreground: oklch(0.19 0.028 253);
+
+  --paper: oklch(0.97 0.012 90);
+  --paper-foreground: oklch(0.25 0.02 260);
+
+  --border: oklch(0.33 0.03 253);
+  --input: oklch(0.33 0.03 253);
+  --ring: oklch(0.79 0.16 76);
+
+  --chart-1: oklch(0.79 0.16 76);
+  --chart-2: oklch(0.72 0.11 195);
+  --chart-3: oklch(0.72 0.15 155);
+  --chart-4: oklch(0.68 0.16 20);
+  --chart-5: oklch(0.7 0.13 300);
+
+  --sidebar: oklch(0.22 0.03 253);
+  --sidebar-foreground: oklch(0.96 0.008 250);
+  --sidebar-primary: oklch(0.79 0.16 76);
+  --sidebar-primary-foreground: oklch(0.2 0.04 60);
+  --sidebar-accent: oklch(0.29 0.032 253);
+  --sidebar-accent-foreground: oklch(0.94 0.01 250);
+  --sidebar-border: oklch(0.33 0.03 253);
+  --sidebar-ring: oklch(0.79 0.16 76);
+
+  --gradient-app: radial-gradient(
+      120% 90% at 50% -10%,
+      oklch(0.3 0.05 250 / 0.9) 0%,
+      transparent 60%
+    ),
+    linear-gradient(180deg, oklch(0.19 0.028 253) 0%, oklch(0.16 0.024 253) 100%);
+  --gradient-scan: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.79 0.16 76 / 0.9) 50%,
+    transparent 100%
+  );
+  --shadow-lift: 0 18px 45px -20px oklch(0.05 0.02 250 / 0.9);
+  --shadow-glow: 0 0 0 1px oklch(0.79 0.16 76 / 0.25), 0 12px 40px -12px oklch(0.79 0.16 76 / 0.35);
+}
+
+.dark {
+  --background: oklch(0.19 0.028 253);
+  --foreground: oklch(0.96 0.008 250);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background: var(--gradient-app);
+    background-attachment: fixed;
+    color: var(--color-foreground);
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@utility surface-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lift);
+}
+
+@utility scan-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+@utility receipt-edge {
+  -webkit-mask-image: radial-gradient(circle at 6px 100%, transparent 5px, black 5.5px);
+  mask-image: radial-gradient(circle at 6px 100%, transparent 5px, black 5.5px);
+  -webkit-mask-size: 12px 12px;
+  mask-size: 12px 12px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(1000%);
+    opacity: 0;
+  }
+}
+
+.animate-scanline {
+  animation: scanline 1.6s ease-in-out infinite;
+}
