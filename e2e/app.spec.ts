@@ -4,9 +4,7 @@ test.describe("Receipt Dashboard", () => {
   test("loads the homepage and renders the app header", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText("Receiptly")).toBeVisible();
-    await expect(
-      page.getByText("Scan a receipt, get the data - no typing."),
-    ).toBeVisible();
+    await expect(page.getByText("Scan a receipt, get the data - no typing.")).toBeVisible();
   });
 
   test("shows Scan and Browse action buttons", async ({ page }) => {
