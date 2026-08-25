@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { supabaseAdmin, isSupabaseConfigured } from "@/integrations/supabase/client.server";
 import { processDocument } from "@/lib/veryfi.server";
 import type { ReceiptLineItem } from "@/lib/receipts.functions";
 import { validateScanInput } from "@/lib/scan-validation";
@@ -7,6 +7,10 @@ import { validateScanInput } from "@/lib/scan-validation";
 export const runtime = "nodejs";
 
 export async function GET() {
+  if (!isSupabaseConfigured()) {
+    console.warn("[api/receipts] Supabase is not configured; returning an empty list.");
+    return NextResponse.json([]);
+  }
   const { data, error } = await supabaseAdmin
     .from("receipts")
     .select(

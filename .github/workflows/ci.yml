@@ -17,7 +17,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev]
   push:
     branches: [main]
 
@@ -27,13 +27,13 @@ concurrency:
 
 # Share env vars across all jobs – values come from repository secrets.
 env:
-  SUPABASE_URL:             ${{ secrets.SUPABASE_URL             }}
-  SUPABASE_ANON_KEY:        ${{ secrets.SUPABASE_ANON_KEY        }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL             }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY        }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-  VERYFI_CLIENT_ID:         ${{ secrets.VERYFI_CLIENT_ID         }}
-  VERYFI_CLIENT_SECRET:     ${{ secrets.VERYFI_CLIENT_SECRET     }}
-  VERYFI_API_KEY:           ${{ secrets.VERYFI_API_KEY           }}
-  VERYFI_USERNAME:          ${{ secrets.VERYFI_USERNAME          }}
+  VERYFI_CLIENT_ID: ${{ secrets.VERYFI_CLIENT_ID         }}
+  VERYFI_CLIENT_SECRET: ${{ secrets.VERYFI_CLIENT_SECRET     }}
+  VERYFI_API_KEY: ${{ secrets.VERYFI_API_KEY           }}
+  VERYFI_USERNAME: ${{ secrets.VERYFI_USERNAME          }}
 
 jobs:
   # ── Quality checks (lint + build) ──────────────────────────────────────────
@@ -144,7 +144,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0          # Full history for accurate analysis
+          fetch-depth: 0 # Full history for accurate analysis
 
       - name: Download coverage artifact
         uses: actions/download-artifact@v4
@@ -156,6 +156,6 @@ jobs:
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@v5
         env:
-          GITHUB_TOKEN:   ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io

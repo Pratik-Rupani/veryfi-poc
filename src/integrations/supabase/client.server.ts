@@ -58,6 +58,11 @@ function createSupabaseAdminClient() {
   });
 }
 
+// True when the server environment carries usable Supabase credentials.
+export function isSupabaseConfigured(): boolean {
+  return Boolean(process.env["SUPABASE_URL"] && process.env["SUPABASE_SERVICE_ROLE_KEY"]);
+}
+
 let _supabaseAdmin: ReturnType<typeof createSupabaseAdminClient> | undefined;
 
 // Server-side Supabase client with service role - bypasses RLS

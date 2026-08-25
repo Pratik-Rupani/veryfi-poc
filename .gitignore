@@ -17,6 +17,10 @@ dist-ssr
 .nitro
 *.local
 
+# Environment files
+.env
+.env.*
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
@@ -31,6 +35,9 @@ blob-report/
 
 # Test coverage
 coverage/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
