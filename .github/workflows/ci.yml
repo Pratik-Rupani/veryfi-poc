@@ -29,7 +29,7 @@ concurrency:
 env:
   SUPABASE_URL:             ${{ secrets.SUPABASE_URL             }}
   SUPABASE_ANON_KEY:        ${{ secrets.SUPABASE_ANON_KEY        }}
-  SUPABASE_SERVICE_ROLE_KEY:${{ secrets.SUPABASE_SERVICE_ROLE_KEY}}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   VERYFI_CLIENT_ID:         ${{ secrets.VERYFI_CLIENT_ID         }}
   VERYFI_CLIENT_SECRET:     ${{ secrets.VERYFI_CLIENT_SECRET     }}
   VERYFI_API_KEY:           ${{ secrets.VERYFI_API_KEY           }}
