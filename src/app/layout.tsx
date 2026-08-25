@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "../styles.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
   title: "Receiptly - Scan Receipts with Your Camera",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <Toaster position="top-center" richColors />
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 {
   "name": "Receiptly — Receipt Scanner",
   "short_name": "Receiptly",
+  "id": "/",
   "description": "Scan paper receipts with your camera and get structured expense data instantly.",
   "start_url": "/",
   "scope": "/",
