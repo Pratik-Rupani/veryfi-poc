@@ -25,4 +25,8 @@ describe("cn (className merge utility)", () => {
   it("ignores falsy values (undefined, null, false, 0)", () => {
     expect(cn("hello", undefined, null, false, 0, "world")).toBe("hello world");
   });
+
+  it("accepts an array of class names", () => {
+    expect(cn(["flex", "items-center", "gap-2"])).toBe("flex items-center gap-2");
+  });
 });
